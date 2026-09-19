@@ -1,7 +1,8 @@
 # 🔨 Assignment 15: Real-Time Live Auction & Bidding Engine (Socket.io)
 
 **Track:** Backend & Real-Time Web | **Level:** Advanced | **Estimated Time:** 8–10 Hours  
-**Tech Stack:** Node.js, Express.js, Socket.io, In-Memory State Engine, Timer Synchronizer, CORS
+**Tech Stack:** Node.js, Express.js, Socket.io, In-Memory State Engine, Timer Synchronizer, CORS  
+**Live Deployment:** [https://assignment-15-realtime-auction-platform-t577.onrender.com](https://assignment-15-realtime-auction-platform-t577.onrender.com/)
 
 ---
 
