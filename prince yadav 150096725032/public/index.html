@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AUCTIO//PULSE — Real-Time Live Auction & Bidding Floor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Real-Time Top Ticker Tape -->
+  <div class="ticker-bar" id="tickerBar">
+    <div class="ticker-label">
+      <span class="live-dot"></span> LIVE TICKER
+    </div>
+    <div class="ticker-scroll-wrapper">
+      <div class="ticker-content" id="tickerContent">
+        <span class="ticker-item">⚡ Floor connected to Socket.io cluster</span>
+        <span class="ticker-item">🛡️ Anti-Snipe Soft Close Engine Active (15s Window)</span>
+        <span class="ticker-item">🎸 Lot #AUC_VINTAGE_99 open for bids</span>
+        <span class="ticker-item">💰 Minimum increments strictly enforced by server</span>
+      </div>
+    </div>
+    <div class="ticker-stats">
+      <span class="stat-pill"><span class="ping-dot"></span> <span id="networkPing">12ms</span></span>
+    </div>
+  </div>
+
+  <!-- Header Navigation -->
+  <header class="app-header">
+    <div class="header-brand">
+      <div class="brand-logo">
+        <span class="logo-icon">⚡</span>
+      </div>
+      <div>
+        <h1 class="brand-title">AUCTIO<span class="brand-accent">//</span>PULSE</h1>
+        <p class="brand-subtitle">High-Frequency Real-Time Auction Engine</p>
+      </div>
+    </div>
+
+    <!-- Active Room Selector Tabs -->
+    <div class="room-nav" id="roomNav">
+      <!-- Injected dynamically via app.js -->
+    </div>
+
+    <!-- User Profile & Audio Controls -->
+    <div class="header-actions">
+      <!-- Wallet Balance Pill -->
+      <div class="wallet-chip" id="walletChip" title="Click to add simulated funds">
+        <span class="wallet-icon">💳</span>
+        <div class="wallet-info">
+          <span class="wallet-label">SIMULATED WALLET</span>
+          <span class="wallet-amount" id="walletAmount">₹500,000</span>
+        </div>
+        <button class="wallet-add-btn" id="btnAddFunds" title="Add funds">+</button>
+      </div>
+
+      <!-- User Identification -->
+      <div class="user-chip">
+        <div class="user-avatar" id="userAvatar">V</div>
+        <div class="user-meta">
+          <span class="user-handle" id="userHandle">Vikram</span>
+          <button class="btn-change-user" id="btnChangeUser" title="Change Username">✎ Edit</button>
+        </div>
+      </div>
+
+      <!-- Sound Toggle -->
+      <button class="icon-toggle-btn active" id="btnSoundToggle" title="Toggle Sound FX">
+        <span id="soundIcon">🔊</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Trading Floor Container -->
+  <main class="trading-floor">
+    <!-- Left Column: Primary Lot & Countdown Arena -->
+    <section class="lot-arena">
+      <!-- Lot Header & Badges -->
+      <div class="lot-header">
+        <div class="lot-tags">
+          <span class="badge lot-id-badge" id="lotIdBadge">AUC_VINTAGE_99</span>
+          <span class="badge category-badge" id="lotCategoryBadge">Vintage Guitars</span>
+          <span class="badge live-badge" id="lotStatusBadge">
+            <span class="pulse-indicator"></span> LIVE AUCTION
+          </span>
+        </div>
+        <div class="lot-viewers">
+          <span class="eye-icon">👁️</span>
+          <span id="viewersCount">1</span> watching
+        </div>
+      </div>
+
+      <!-- Lot Showcase & Countdown HUD -->
+      <div class="lot-display-card">
+        <div class="lot-visual-wrapper">
+          <div class="lot-hero-graphic" id="lotHeroGraphic">🎸</div>
+          <div class="anti-snipe-banner" id="antiSnipeBanner">
+            <span class="shield-icon">🛡️</span>
+            <span>ANTI-SNIPE ACTIVE: Bids under 15s reset clock to 20s</span>
+          </div>
+        </div>
+
+        <div class="lot-info">
+          <h2 class="lot-title" id="lotTitle">1967 Vintage Fender Stratocaster</h2>
+          <p class="lot-description" id="lotDescription">
+            Original sunburst nitrocellulose finish, rare hand-wound pickups, verified provenance. Museum-grade collector condition with original hardshell case.
+          </p>
+
+          <!-- Starting & Increment Meta -->
+          <div class="lot-specs-row">
+            <div class="spec-col">
+              <span class="spec-label">STARTING PRICE</span>
+              <span class="spec-value" id="specStartingPrice">₹50,000</span>
+            </div>
+            <div class="spec-col">
+              <span class="spec-label">MIN INCREMENT</span>
+              <span class="spec-value" id="specMinIncrement">+₹2,000</span>
+            </div>
+            <div class="spec-col">
+              <span class="spec-label">RESERVE STATUS</span>
+              <span class="spec-value text-emerald">MET</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Central Price & Timer Marquee -->
+      <div class="bidding-hud">
+        <!-- Live Countdown Dial -->
+        <div class="timer-dial-card" id="timerDialCard">
+          <div class="timer-svg-container">
+            <svg class="timer-ring" width="130" height="130">
+              <circle class="timer-ring-bg" cx="65" cy="65" r="54"></circle>
+              <circle class="timer-ring-progress" id="timerProgress" cx="65" cy="65" r="54"></circle>
+            </svg>
+            <div class="timer-ring-content">
+              <span class="timer-time" id="timerTime">00:60</span>
+              <span class="timer-sublabel" id="timerSublabel">TIME LEFT</span>
+            </div>
+          </div>
+          <div class="timer-status-caption" id="timerCaption">Official Server Clock</div>
+        </div>
+
+        <!-- Current Price Board -->
+        <div class="price-board" id="priceBoard">
+          <div class="price-board-header">
+            <span class="price-label">CURRENT HIGHEST BID</span>
+            <div class="your-status-pill" id="yourStatusPill">
+              <span>SPECTATING</span>
+            </div>
+          </div>
+
+          <div class="price-main">
+            <span class="currency-symbol">₹</span>
+            <span class="price-digits" id="currentPrice">50,000</span>
+          </div>
+
+          <div class="highest-bidder-strip">
+            <span class="strip-label">LEADER:</span>
+            <span class="strip-bidder" id="highestBidderName">None yet (Opening Price)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Interactive Bidding Deck -->
+      <div class="bidding-deck" id="biddingDeck">
+        <div class="deck-header">
+          <span class="deck-title">⚡ PLACE YOUR BID</span>
+          <span class="deck-min-hint" id="deckMinHint">Minimum valid bid: ₹52,000</span>
+        </div>
+
+        <!-- Quick Increments Row -->
+        <div class="quick-increment-grid">
+          <button class="btn-increment active" id="btnIncMin" data-type="min">
+            <span class="inc-tag">+Min</span>
+            <span class="inc-val" id="incMinVal">₹52,000</span>
+          </button>
+          <button class="btn-increment" id="btnInc2x" data-type="2x">
+            <span class="inc-tag">+2x Inc</span>
+            <span class="inc-val" id="inc2xVal">₹54,000</span>
+          </button>
+          <button class="btn-increment" id="btnInc5x" data-type="5x">
+            <span class="inc-tag">+5x Inc</span>
+            <span class="inc-val" id="inc5xVal">₹60,000</span>
+          </button>
+        </div>
+
+        <!-- Custom Bid Slider & Input -->
+        <div class="custom-bid-row">
+          <div class="custom-input-wrapper">
+            <span class="input-currency">₹</span>
+            <input type="number" id="customBidInput" class="custom-bid-input" placeholder="Enter bid amount" step="1000">
+          </div>
+          <button class="btn-place-bid" id="btnPlaceBid">
+            <span class="btn-bid-icon">⚡</span>
+            <span class="btn-bid-text">CONFIRM & BID</span>
+            <span class="btn-bid-amount" id="btnBidAmount">₹52,000</span>
+          </button>
+        </div>
+
+        <!-- Feedback & Error Message -->
+        <div class="bid-feedback-box" id="bidFeedbackBox">
+          <span id="bidFeedbackText"></span>
+        </div>
+      </div>
+
+      <!-- Quick Auction Admin Controls -->
+      <div class="lot-admin-bar">
+        <span class="admin-label">TESTBENCH CONTROLS:</span>
+        <button class="btn-admin-action" id="btnResetAuction" title="Reset auction back to starting price">
+          🔄 Reset Auction (60s)
+        </button>
+        <button class="btn-admin-action" id="btnAntiSnipeTest" title="Set timer to 10s to test Anti-Snipe extension">
+          ⏱️ Jump to 10s (Anti-Snipe Test)
+        </button>
+      </div>
+    </section>
+
+    <!-- Right Column: Auditable Live Bid Activity Feed -->
+    <aside class="activity-sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-title-group">
+          <span class="feed-icon">📜</span>
+          <h3 class="sidebar-title">Live Audit Feed</h3>
+        </div>
+        <span class="bid-count-badge" id="bidCountBadge">0 Bids</span>
+      </div>
+
+      <!-- Activity Tabs: All Bids vs System Alerts -->
+      <div class="feed-filter-bar">
+        <button class="filter-tab active" data-filter="all">All Bids</button>
+        <button class="filter-tab" data-filter="my">My Actions</button>
+        <button class="filter-tab" data-filter="system">System Logs</button>
+      </div>
+
+      <!-- Live Stream Items Container -->
+      <div class="feed-stream" id="feedStream">
+        <div class="feed-empty-state" id="feedEmptyState">
+          <span class="empty-icon">⏳</span>
+          <p>Auction floor is open.<br>Awaiting the opening bid.</p>
+        </div>
+      </div>
+
+      <!-- Competitor Bot Simulator Card -->
+      <div class="simulator-card">
+        <div class="sim-header">
+          <div class="sim-title">
+            <span class="bot-icon">🤖</span>
+            <span>Multi-Bidder Bot Simulator</span>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="botSimToggle">
+            <span class="slider round"></span>
+          </label>
+        </div>
+        <p class="sim-desc">
+          Simulate competing bidders (Vikram, Elena, Marcus) placing bids every few seconds to test race conditions & anti-snipe live!
+        </p>
+        <div class="sim-actions">
+          <button class="btn-sim-single" id="btnSimSingleBid">💥 Trigger Competitor Bid Now</button>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <!-- Targeted Outbid Toast Notification Modal -->
+  <div class="outbid-toast" id="outbidToast">
+    <div class="toast-indicator"></div>
+    <div class="toast-body">
+      <div class="toast-header">
+        <span class="toast-alert-icon">⚠️</span>
+        <span class="toast-alert-title">OUTBID ALERT</span>
+        <button class="toast-close" id="btnCloseToast">✕</button>
+      </div>
+      <p class="toast-message" id="toastMessage">You have been outbid by Elena with ₹56,000!</p>
+      <div class="toast-actions">
+        <button class="btn-counter-bid" id="btnCounterBid">⚡ Counter-Bid with +Min</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Auction Ended / Victory Modal -->
+  <div class="modal-overlay" id="victoryModal">
+    <div class="modal-container">
+      <div class="modal-graphic" id="modalGraphic">🏆</div>
+      <h2 class="modal-title" id="modalTitle">AUCTION COMPLETED</h2>
+      <p class="modal-subtitle" id="modalSubtitle">The gavel has struck. Bidding is officially closed.</p>
+      
+      <div class="modal-result-card">
+        <div class="result-row">
+          <span class="result-label">WINNING BIDDER</span>
+          <span class="result-value text-gold" id="modalWinnerName">Vikram</span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">HAMMER PRICE</span>
+          <span class="result-value text-emerald" id="modalFinalPrice">₹62,000</span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">ITEM</span>
+          <span class="result-value" id="modalItemTitle">1967 Vintage Fender Stratocaster</span>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-modal-primary" id="btnModalReset">Restart Lot Auction</button>
+        <button class="btn-modal-secondary" id="btnModalClose">Dismiss</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Change User Modal -->
+  <div class="modal-overlay" id="userModal">
+    <div class="modal-container modal-small">
+      <h3 class="modal-title">Bidder Identity</h3>
+      <p class="modal-subtitle">Set your display name on the bidding floor.</p>
+      <div class="user-input-group">
+        <input type="text" id="inputUsername" class="user-input-field" placeholder="Enter username" maxlength="20">
+      </div>
+      <div class="modal-actions">
+        <button class="btn-modal-primary" id="btnSaveUsername">Save & Join Floor</button>
+        <button class="btn-modal-secondary" id="btnCloseUserModal">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Socket.io Client Script -->
+  <script src="/socket.io/socket.io.js"></script>
+  <!-- Main Frontend Application Logic -->
+  <script src="app.js"></script>
+</body>
+</html>
