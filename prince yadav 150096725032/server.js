@@ -136,7 +136,7 @@ if (require.main === module) {
     if (!available) {
       console.warn(`⚠️ Port ${requestedPort} is occupied (macOS AirPlay Receiver reserves port 5000). Serving on http://localhost:${finalPort}`);
     }
-    server.listen(finalPort, () => {
+    server.listen(finalPort, '0.0.0.0', () => {
       console.log(`=======================================================`);
       console.log(`🔥 Real-Time Live Auction & Bidding Engine running!`);
       console.log(`📡 Server listening on: http://localhost:${finalPort}`);
